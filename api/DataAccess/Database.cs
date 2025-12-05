@@ -67,6 +67,21 @@ namespace MyApp.Namespace.DataAccess
             }
             return (T)Convert.ChangeType(result, typeof(T));
         }
+
+        public async Task<long> ExecuteInsertAndGetIdAsync(string insertQuery, params MySqlParameter[] parameters)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new MySqlCommand(insertQuery, connection);
+            if (parameters != null && parameters.Length > 0)
+            {
+                command.Parameters.AddRange(parameters);
+            }
+
+            await command.ExecuteNonQueryAsync();
+            return command.LastInsertedId;
+        }
     }
 }
 
